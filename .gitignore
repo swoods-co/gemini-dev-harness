@@ -1,0 +1,29 @@
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment and Secret Files
+.env
+.env*.local
+*.pem
+*.key
+
+# Node / Package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs & Diagnostics
+*.log
+.gemini/
+
+# Temporary & Worktrees
+.worktrees/
+tmp/
+temp/
+scratch/
+dist/
+coverage/

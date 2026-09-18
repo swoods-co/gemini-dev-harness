@@ -1,0 +1,15 @@
+{
+  "name": "frontend-dev-harness",
+  "version": "1.0.0",
+  "description": "Universal frontend development harness for project scoping, constraints, tech stack configuration, worktree rules, and CI/CD deployment.",
+  "author": "Antigravity Engineering",
+  "keywords": [
+    "frontend",
+    "harness",
+    "scoping",
+    "worktrees",
+    "github",
+    "netlify",
+    "ci-cd"
+  ]
+}
