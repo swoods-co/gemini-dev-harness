@@ -42,20 +42,22 @@ Run this skill when:
    ```
 
 ### Step 3: Scaffold Project Specification Contract & Living Agent Rules
-1. Create `.project/features/` and `.github/workflows/` directories:
+1. Create `.project/features/`, `.project/contracts/`, and `.github/workflows/` directories:
    ```bash
-   mkdir -p .project/features .github/workflows
+   mkdir -p .project/features .project/contracts .github/workflows
    ```
 2. Copy the harness blueprint templates into `.project/`:
    - POSIX:
      ```bash
      cp .agents/plugins/frontend-harness/templates/project-spec/*.md .project/
      cp .agents/plugins/frontend-harness/templates/project-spec/features/*.md .project/features/
+     cp .agents/plugins/frontend-harness/templates/project-spec/contracts/*.md .project/contracts/
      ```
    - Windows PowerShell:
      ```powershell
      Copy-Item .agents/plugins/frontend-harness/templates/project-spec/*.md .project/
      Copy-Item .agents/plugins/frontend-harness/templates/project-spec/features/*.md .project/features/
+     Copy-Item .agents/plugins/frontend-harness/templates/project-spec/contracts/*.md .project/contracts/
      ```
 3. Copy the host project's living agent guidelines (`AGENTS.md`):
    - This file ensures future agents working on features or PRs in this project adhere to component boundaries, contract-first mock data, and CI/CD gates.

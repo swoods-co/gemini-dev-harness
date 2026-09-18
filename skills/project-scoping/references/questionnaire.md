@@ -18,6 +18,12 @@ When conducting a project scoping session, use these targeted questions to guide
 - **Devices**: Any legacy device requirements, or evergreen browsers only?
 - **Security & Data**: Are there GDPR, HIPAA, or strict authentication requirements (OAuth, SAML, SSO)?
 
-### 4. Technical Boundaries & Non-Goals
-- Are there backend APIs already existing, or do mock services need to be created first?
-- What features should we explicitly declare out of scope?
+### 4. Backend Contracts & Existing Repositories
+- **Existing Backend**: Does a backend repository (e.g. Go, PostgreSQL, Node, Python) already exist, or is one currently being built?
+- **Repository Reference**: What is the GitHub repository name (e.g. `owner/backend-repo`) or local folder path so the agent can inspect Go structs, routes, or SQL schemas?
+- **API Documentation**: Is there an OpenAPI / Swagger endpoint or file (`swagger.json`, `openapi.yaml`) available?
+- *(If yes: Immediately run `backend-contract-sync` to generate types and mocks from real schemas).*
+
+### 5. Non-Goals & Boundaries
+- What features or integrations should we explicitly declare out of scope for this version?
+- Are there third-party SDKs or legacy APIs that will be deferred to later milestones?

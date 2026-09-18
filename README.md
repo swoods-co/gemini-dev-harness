@@ -16,6 +16,7 @@ A universal, shareable **Antigravity Plugin** and development harness for modern
 ├── skills/
 │   ├── init-frontend-harness/  # Zero-command agent bootstrap via git submodule
 │   ├── project-scoping/        # Inception, user journeys, constraints & acceptance criteria
+│   ├── backend-contract-sync/  # Ingests Go structs, OpenAPI, & SQL schemas from backend repos
 │   ├── tech-stack-config/      # Framework selection, scaffolding, strict TS, linting & tests
 │   ├── team-orchestration/     # Parallel subagent team dispatch (UI, DevOps, A11y, API)
 │   ├── worktree-workflow/      # Safe parallel agent development in isolated .worktrees/
@@ -23,7 +24,8 @@ A universal, shareable **Antigravity Plugin** and development harness for modern
 ├── templates/                  # Ready-to-use blueprints injected into host projects
 │   ├── project-root/           # AGENTS.md (living rules for future agent runs in the host repo)
 │   ├── project-spec/           # SCOPE.md, CONSTRAINTS.md, TECH_STACK.md, ARCHITECTURE.md, DEPLOYMENT.md
-│   │   └── features/           # FEATURE_TEMPLATE.md (granular feature specifications)
+│   │   ├── features/           # FEATURE_TEMPLATE.md (granular feature specifications)
+│   │   └── contracts/          # README.md & canonical backend schema storage
 │   ├── github/                 # pull_request_template.md (contract & verification checklist)
 │   ├── github-actions/         # ci.yml, preview.yml
 │   └── netlify/                # netlify.toml with security headers & caching
@@ -166,12 +168,21 @@ The agent asks targeted discovery questions:
 - **Core User Journeys**: What 2-3 workflows are MVP blockers?
 - **User Personas & Devices**: Who uses it daily, and on what devices?
 - **Hard Constraints**: Core Web Vitals (LCP < 2.5s), WCAG 2.1 AA accessibility, browser support.
+- **Backend Repositories**: Do Go/Postgres backend models, routes, or OpenAPI specs already exist?
 - **Explicit Non-Goals**: What is deferred or out of scope?
 
-### 2. Specification Generation
+### 2. Backend Contract Ingestion (`backend-contract-sync`)
+If you have an existing backend repository:
+- The agent inspects the backend via **GitHub MCP** (zero Docker, zero clone) or local path.
+- Automatically parses Go structs, JSON tags, router definitions (Gin/Chi/Echo/Fiber), or OpenAPI specs.
+- Saves canonical contracts into `.project/contracts/`.
+- Generates strict TypeScript types into `src/types/api.generated.ts` and configures `npm run codegen:api`.
+- Generates typed mock handlers in `src/services/mock/` so you can build and test immediately.
+
+### 3. Specification Generation
 The agent writes testable Given-When-Then (Gherkin) acceptance criteria into `.project/SCOPE.md` and records performance limits in `.project/CONSTRAINTS.md`.
 
-### 3. Tech Stack Bootstrapping (`tech-stack-config`)
+### 4. Tech Stack Bootstrapping (`tech-stack-config`)
 The agent selects and configures:
 - **Framework**: Vite + React / Next.js / Astro based on your SEO and interactivity requirements.
 - **Styling**: Tailwind CSS v4 with design tokens.
@@ -196,6 +207,7 @@ For subsequent feature development, the agent executes inside isolated git workt
 | :--- | :--- | :--- |
 | **`init-frontend-harness`** | Zero-command project bootstrap ("set up harness", "bootstrap project"). | `git init`, submodule add, `.project/` scaffolding, `.gitignore` |
 | **`project-scoping`** | New project initialization, missing `.project/`, refining requirements. | `.project/SCOPE.md`, `.project/CONSTRAINTS.md`, `.project/ARCHITECTURE.md` |
+| **`backend-contract-sync`** | Connecting to backend repo, importing Go/SQL schemas, or OpenAPI specs. | Ingested `.project/contracts/`, `src/types/api.generated.ts`, typed MSW mock handlers |
 | **`tech-stack-config`** | Post-scoping, configuring framework, styling, testing, or linting. | Scaffolding, `tsconfig.json`, `package.json`, `.project/TECH_STACK.md` |
 | **`team-orchestration`** | Post-scoping foundation kickoff, parallel multi-agent milestone dispatch. | Concurrently runs DevOps, UI/UX, A11y, and API subagents in isolated branches |
 | **`worktree-workflow`** | Feature additions, bug fixes, parallel agent tasks. | Isolated `.worktrees/<branch>`, safe merge & cleanup |

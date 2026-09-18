@@ -59,15 +59,19 @@ if (Test-Path "$TargetPath/templates") {
     $harnessRoot = "templates"
 }
 
-# 1. Scaffold .project/ directory and feature specs
+# 1. Scaffold .project/ directory, feature specs, and backend contracts
 Write-Host "Checking project specification directory (.project/)..." -ForegroundColor Yellow
 if (-not (Test-Path ".project")) {
-    Write-Host "Creating .project/ and .project/features/ directories..." -ForegroundColor Green
+    Write-Host "Creating .project/, .project/features/, and .project/contracts/ directories..." -ForegroundColor Green
     New-Item -ItemType Directory -Path ".project/features" -Force | Out-Null
+    New-Item -ItemType Directory -Path ".project/contracts" -Force | Out-Null
 
     if ($harnessRoot) {
         Copy-Item -Path "$harnessRoot/project-spec/*.md" -Destination ".project/" -Force
         Copy-Item -Path "$harnessRoot/project-spec/features/*.md" -Destination ".project/features/" -Force
+        if (Test-Path "$harnessRoot/project-spec/contracts") {
+            Copy-Item -Path "$harnessRoot/project-spec/contracts/*.md" -Destination ".project/contracts/" -Force
+        }
         Write-Host "Scaffolded default templates into .project/ from harness." -ForegroundColor Green
     }
 } else {
@@ -76,6 +80,12 @@ if (-not (Test-Path ".project")) {
         New-Item -ItemType Directory -Path ".project/features" -Force | Out-Null
         if ($harnessRoot -and (Test-Path "$harnessRoot/project-spec/features")) {
             Copy-Item -Path "$harnessRoot/project-spec/features/*.md" -Destination ".project/features/" -Force
+        }
+    }
+    if (-not (Test-Path ".project/contracts")) {
+        New-Item -ItemType Directory -Path ".project/contracts" -Force | Out-Null
+        if ($harnessRoot -and (Test-Path "$harnessRoot/project-spec/contracts")) {
+            Copy-Item -Path "$harnessRoot/project-spec/contracts/*.md" -Destination ".project/contracts/" -Force
         }
     }
 }

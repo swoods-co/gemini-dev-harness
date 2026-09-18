@@ -44,12 +44,15 @@ elif [[ -d "templates" ]]; then
   HARNESS_ROOT="templates"
 fi
 
-# 1. Scaffold .project/ directory & feature templates
+# 1. Scaffold .project/ directory, feature templates & backend contracts
 echo "Checking project specification directory (.project/)..."
-mkdir -p .project/features
+mkdir -p .project/features .project/contracts
 if [[ -n "$HARNESS_ROOT" && -d "$HARNESS_ROOT/project-spec" ]]; then
   cp -n "$HARNESS_ROOT/project-spec/"*.md .project/ 2>/dev/null || true
   cp -n "$HARNESS_ROOT/project-spec/features/"*.md .project/features/ 2>/dev/null || true
+  if [[ -d "$HARNESS_ROOT/project-spec/contracts" ]]; then
+    cp -n "$HARNESS_ROOT/project-spec/contracts/"*.md .project/contracts/ 2>/dev/null || true
+  fi
   echo "Scaffolded default templates into .project/ from harness."
 fi
 

@@ -36,7 +36,9 @@ If key information is missing, use the questions in [references/questionnaire.md
    - What are the performance and Core Web Vitals expectations?
    - Accessibility requirements (WCAG 2.1 AA baseline).
    - Target devices and browser support.
-4. **Third-Party & Backend Dependencies**: What APIs, authentication providers, or backend services will be integrated?
+4. **Existing Backend Repositories & API Contracts**:
+   - Does an existing backend repository (e.g. Go, PostgreSQL, Node), OpenAPI/Swagger spec, or database migration set already exist?
+   - If **yes**, note the repository name, local path, or URL and activate the **`backend-contract-sync`** skill to import real data models, routes, and constraints before inventing temporary mock types.
 5. **Non-Goals**: What is explicitly out of scope for this version?
 
 ### Step 3: Scaffold `.project/` Documentation
