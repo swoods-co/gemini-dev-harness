@@ -52,9 +52,11 @@ Once `.project/SCOPE.md`, `CONSTRAINTS.md`, and `TECH_STACK.md` are established,
 ### 4. 🔒 API, Data Contracts & Security Specialist
 - **Workspace**: `Workspace: "branch"` (branch: `feat/api-client-core`)
 - **Mission**:
-  - Builds resilient HTTP client wrapper (exponential backoff retry, timeout handling).
-  - Implements Zod validation schemas matching backend contracts.
+  - Ingests backend schemas/contracts (OpenAPI, Swagger, GraphQL, or JSON payloads) and generates TypeScript types and Zod validation schemas.
+  - Builds a mock data layer (`VITE_USE_MOCKS=true`) providing realistic dummy data for MVP testing prior to backend readiness.
+  - Builds resilient HTTP client wrapper (exponential backoff retry, timeout handling, error logging).
   - Sets up TanStack Query / SWR providers and query client defaults.
+  - Ensures a zero-code-change flip to production via `VITE_API_BASE_URL`.
   - Validates `.env.example` and runtime secret sanitation.
 
 ---
