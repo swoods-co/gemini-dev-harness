@@ -14,6 +14,7 @@ A universal, shareable **Antigravity Plugin** and development harness for modern
 ├── rules/
 │   └── AGENTS.md               # Universal workspace rules (worktree rules, CI/CD, host contract)
 ├── skills/
+│   ├── init-frontend-harness/  # Zero-command agent bootstrap via git submodule
 │   ├── project-scoping/        # Inception, user journeys, constraints & acceptance criteria
 │   ├── tech-stack-config/      # Framework selection, scaffolding, strict TS, linting & tests
 │   ├── team-orchestration/     # Parallel subagent team dispatch (UI, DevOps, A11y, API)
@@ -24,8 +25,10 @@ A universal, shareable **Antigravity Plugin** and development harness for modern
 │   ├── github-actions/         # ci.yml, preview.yml
 │   └── netlify/                # netlify.toml with security headers & caching
 ├── scripts/
-│   ├── install-harness.sh      # POSIX installer to wire up the submodule in a project
-│   └── install-harness.ps1     # PowerShell installer for Windows
+│   ├── install-global-skill.ps1 # One-line global installer for Windows
+│   ├── install-global-skill.sh  # One-line global installer for Linux / macOS
+│   ├── install-harness.ps1     # PowerShell installer for host repos
+│   └── install-harness.sh      # POSIX installer for host repos
 └── README.md
 ```
 
@@ -51,7 +54,31 @@ When Antigravity runs in a project equipped with this harness, agents read from 
 
 ## Quickstart: Adding to Any Frontend Repository
 
-### Option A: Using the Installer Script (Recommended)
+### Option A: Pure Prompt-Driven Setup (Zero Terminal Commands)
+
+Install the global bootstrap skill once on your machine:
+
+**Windows PowerShell:**
+```powershell
+irm https://raw.githubusercontent.com/swoods-co/gemini-dev-harness/main/scripts/install-global-skill.ps1 | iex
+```
+
+**Linux / macOS:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/swoods-co/gemini-dev-harness/main/scripts/install-global-skill.sh | bash
+```
+
+*(Or install the entire harness globally: `agy plugin install swoods-co/gemini-dev-harness`)*
+
+**Then, in ANY new project:**
+1. Open an empty folder in Antigravity.
+2. Type in chat:
+   > *"Set up this project with my frontend harness."*
+3. The agent executes `git init`, links the submodule, scaffolds `.project/`, and starts the scoping interview automatically!
+
+---
+
+### Option B: Using the Local Installer Script
 
 In your host repository root:
 
@@ -69,7 +96,7 @@ git init -b main
 
 ---
 
-### Option B: Manual Git Submodule Setup
+### Option C: Manual Git Submodule Setup
 
 1. Add the harness submodule inside `.agents/plugins/frontend-harness`:
    ```bash
@@ -159,6 +186,7 @@ For subsequent feature development, the agent executes inside isolated git workt
 
 | Skill | Trigger / When it Activates | Deliverables |
 | :--- | :--- | :--- |
+| **`init-frontend-harness`** | Zero-command project bootstrap ("set up harness", "bootstrap project"). | `git init`, submodule add, `.project/` scaffolding, `.gitignore` |
 | **`project-scoping`** | New project initialization, missing `.project/`, refining requirements. | `.project/SCOPE.md`, `.project/CONSTRAINTS.md`, `.project/ARCHITECTURE.md` |
 | **`tech-stack-config`** | Post-scoping, configuring framework, styling, testing, or linting. | Scaffolding, `tsconfig.json`, `package.json`, `.project/TECH_STACK.md` |
 | **`team-orchestration`** | Post-scoping foundation kickoff, parallel multi-agent milestone dispatch. | Concurrently runs DevOps, UI/UX, A11y, and API subagents in isolated branches |
