@@ -2,6 +2,8 @@
 
 A universal, shareable **Antigravity Plugin** and development harness for modern frontend projects. Designed to be included across multiple frontend repositories as a **Git Submodule**, providing battle-tested agent workflows, project scoping, constraints management, framework scaffolding, git worktree isolation, and CI/CD pipelines with GitHub and Netlify MCPs.
 
+- **GitHub Repository**: [https://github.com/swoods-co/gemini-dev-harness](https://github.com/swoods-co/gemini-dev-harness)
+
 ---
 
 ## Architecture Overview
@@ -52,18 +54,16 @@ When Antigravity runs in a project equipped with this harness, agents read from 
 
 In your host repository root:
 
-**Linux / macOS:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/<your-org>/gemini-dev-harness/main/scripts/install-harness.sh | bash -s -- "https://github.com/<your-org>/gemini-dev-harness.git"
-```
-Or if you have already cloned/submoduled the repo locally:
-```bash
-./scripts/install-harness.sh "https://github.com/<your-org>/gemini-dev-harness.git"
-```
-
 **Windows PowerShell:**
 ```powershell
-.\scripts\install-harness.ps1 -SubmoduleUrl "https://github.com/<your-org>/gemini-dev-harness.git"
+git init -b main
+.\.agents\plugins\frontend-harness\scripts\install-harness.ps1 -SubmoduleUrl "https://github.com/swoods-co/gemini-dev-harness.git"
+```
+
+**Linux / macOS:**
+```bash
+git init -b main
+./.agents\plugins\frontend-harness\scripts\install-harness.sh "https://github.com/swoods-co/gemini-dev-harness.git"
 ```
 
 ---
@@ -72,7 +72,7 @@ Or if you have already cloned/submoduled the repo locally:
 
 1. Add the harness submodule inside `.agents/plugins/frontend-harness`:
    ```bash
-   git submodule add https://github.com/<your-org>/gemini-dev-harness.git .agents/plugins/frontend-harness
+   git submodule add https://github.com/swoods-co/gemini-dev-harness.git .agents/plugins/frontend-harness
    git submodule update --init --recursive
    ```
 
@@ -95,24 +95,69 @@ Or if you have already cloned/submoduled the repo locally:
 
 ---
 
-## Bundled Skills
+## How the Agent Works: Progressive Disclosure & Skill Activation
 
-### 1. `project-scoping`
-- **Purpose**: Runs a structured discovery session to define core personas, P0 user journeys, non-goals, and technical constraints.
-- **Outputs**: Populates `.project/SCOPE.md` and `.project/CONSTRAINTS.md` with testable Gherkin acceptance criteria.
+### Do I have to manually trigger skills?
+**No.** You do **not** need to remember skill names or manually call them.
 
-### 2. `tech-stack-config`
-- **Purpose**: Bootstraps the framework (Vite, Next.js, Astro), configures Tailwind CSS, strict TypeScript, linting (ESLint/Biome), and testing (Vitest).
-- **Outputs**: Populates `.project/TECH_STACK.md` and verifies the build.
+Antigravity operates on **Progressive Disclosure**:
+1. When Antigravity opens your repository, it automatically reads `rules/AGENTS.md` and indexes the descriptions of all bundled skills.
+2. When you start with **any natural prompt** (e.g. *"Let's build a real-time analytics dashboard"* or *"Help me start this new project"*), the agent reads `rules/AGENTS.md`.
+3. The rule mandates that if `.project/` is uninitialized or missing requirements, the agent must **automatically activate `project-scoping`**.
+4. The agent dynamically loads the full scoping skill, asks discovery questions, and populates `.project/`.
+5. Once scoping is complete, it transitions automatically into `tech-stack-config` to bootstrap the code, and `ci-cd-deployment` to configure Netlify and GitHub Actions.
 
-### 3. `worktree-workflow`
-- **Purpose**: Creates and manages isolated Git worktrees (`.worktrees/<branch-name>`) for parallel agent development and risk-free tasks.
-- **Commands**:
-  - `worktree-helper.sh create feat/user-auth`
-  - `worktree-helper.sh remove feat/user-auth`
+---
 
-### 4. `ci-cd-deployment`
-- **Purpose**: Sets up `netlify.toml`, GitHub Actions CI (`.github/workflows/ci.yml`), verifies deploy previews, and tracks deployment metadata in `.project/DEPLOYMENT.md`.
+## The New Project Journey: Step-by-Step
+
+```mermaid
+flowchart TD
+    A[You Type Any Natural Prompt] --> B[Agent Reads rules/AGENTS.md]
+    B --> C{Is .project/ configured?}
+    C -->|No / Incomplete| D[Auto-activates skill: project-scoping]
+    D --> E[Conducts Discovery Interview]
+    E --> F[Generates SCOPE.md, CONSTRAINTS.md, ARCHITECTURE.md]
+    F --> G[Auto-activates skill: tech-stack-config]
+    G --> H[Recommends Framework & Configures Tooling]
+    H --> I[Auto-activates skill: ci-cd-deployment]
+    I --> J[Sets up netlify.toml & GitHub Actions CI]
+    J --> K[Feature Work Ready: Isolated Git Worktrees]
+```
+
+### 1. The Scoping Interview (`project-scoping`)
+The agent asks targeted discovery questions:
+- **Core User Journeys**: What 2-3 workflows are MVP blockers?
+- **User Personas & Devices**: Who uses it daily, and on what devices?
+- **Hard Constraints**: Core Web Vitals (LCP < 2.5s), WCAG 2.1 AA accessibility, browser support.
+- **Explicit Non-Goals**: What is deferred or out of scope?
+
+### 2. Specification Generation
+The agent writes testable Given-When-Then (Gherkin) acceptance criteria into `.project/SCOPE.md` and records performance limits in `.project/CONSTRAINTS.md`.
+
+### 3. Tech Stack Bootstrapping (`tech-stack-config`)
+The agent selects and configures:
+- **Framework**: Vite + React / Next.js / Astro based on your SEO and interactivity requirements.
+- **Styling**: Tailwind CSS v4 with design tokens.
+- **Hygiene & Strictness**: Strict TypeScript (`strict: true`), ESLint/Biome, and Vitest suite.
+- **Documentation**: Records all decisions in `.project/TECH_STACK.md`.
+
+### 4. CI/CD & Deployments (`ci-cd-deployment`)
+The agent copies `netlify.toml` and `.github/workflows/ci.yml`, hooks up Netlify deploy previews, and tracks deployment configurations in `.project/DEPLOYMENT.md`.
+
+### 5. Isolated Worktrees (`worktree-workflow`)
+For subsequent feature development, the agent executes inside isolated git worktrees (`.worktrees/feat-<name>`), verifies builds and tests, pushes branches, and opens PRs using the **GitHub MCP**.
+
+---
+
+## Bundled Skills Reference
+
+| Skill | Trigger / When it Activates | Deliverables |
+| :--- | :--- | :--- |
+| **`project-scoping`** | New project initialization, missing `.project/`, refining requirements. | `.project/SCOPE.md`, `.project/CONSTRAINTS.md`, `.project/ARCHITECTURE.md` |
+| **`tech-stack-config`** | Post-scoping, configuring framework, styling, testing, or linting. | Scaffolding, `tsconfig.json`, `package.json`, `.project/TECH_STACK.md` |
+| **`worktree-workflow`** | Feature additions, bug fixes, parallel agent tasks. | Isolated `.worktrees/<branch>`, safe merge & cleanup |
+| **`ci-cd-deployment`** | Pipeline setup, Netlify preview verification, build troubleshooting. | `netlify.toml`, `.github/workflows/ci.yml`, `.project/DEPLOYMENT.md` |
 
 ---
 
