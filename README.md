@@ -12,7 +12,7 @@ A universal, shareable **Antigravity Plugin** and development harness for modern
 ├── plugin.json                 # Antigravity plugin manifest
 ├── mcp_config.json             # GitHub & Netlify MCP server configurations
 ├── rules/
-│   └── AGENTS.md               # Universal workspace rules (worktree rules, CI/CD, host contract)
+│   └── AGENTS.md               # Harness workspace rules (worktree rules, CI/CD, subagents)
 ├── skills/
 │   ├── init-frontend-harness/  # Zero-command agent bootstrap via git submodule
 │   ├── project-scoping/        # Inception, user journeys, constraints & acceptance criteria
@@ -21,7 +21,10 @@ A universal, shareable **Antigravity Plugin** and development harness for modern
 │   ├── worktree-workflow/      # Safe parallel agent development in isolated .worktrees/
 │   └── ci-cd-deployment/       # GitHub Actions CI & Netlify deploy previews via MCP
 ├── templates/                  # Ready-to-use blueprints injected into host projects
+│   ├── project-root/           # AGENTS.md (living rules for future agent runs in the host repo)
 │   ├── project-spec/           # SCOPE.md, CONSTRAINTS.md, TECH_STACK.md, ARCHITECTURE.md, DEPLOYMENT.md
+│   │   └── features/           # FEATURE_TEMPLATE.md (granular feature specifications)
+│   ├── github/                 # pull_request_template.md (contract & verification checklist)
 │   ├── github-actions/         # ci.yml, preview.yml
 │   └── netlify/                # netlify.toml with security headers & caching
 ├── scripts/
@@ -34,21 +37,26 @@ A universal, shareable **Antigravity Plugin** and development harness for modern
 
 ---
 
-## Clean Separation of Concerns
+## Clean Separation of Concerns & Living Project Rules
 
 To allow this harness to be shared seamlessly across dozens of different projects:
 
 | Layer | Responsibility | Location |
 | :--- | :--- | :--- |
 | **The Harness (Plugin)** | Universal workflows, agent rules, worktree isolation, CI/CD standards, GitHub & Netlify MCP tools. | `.agents/plugins/frontend-harness/` (Git Submodule) |
-| **The Host Project** | Business domain, requirements, feature scope, framework decisions, and environment secrets. | `.project/` in host repository root |
+| **The Host Project Rules** | Living guidelines for future AI agents working on PRs and features after initial harness bootstrap. | `AGENTS.md` in host repository root |
+| **The Host Project Contract** | Business domain, requirements, feature scope, framework decisions, and environment secrets. | `.project/` in host repository root |
+| **The Feature Specifications** | Granular user stories, Gherkin acceptance criteria, and mock requirements for each feature. | `.project/features/` in host repository root |
 
-### The Host Project Contract (`.project/`)
-When Antigravity runs in a project equipped with this harness, agents read from and maintain `.project/`:
-- `.project/SCOPE.md`: Functional scope, user stories, acceptance criteria, milestones.
-- `.project/CONSTRAINTS.md`: Performance budgets (LCP, INP, CLS), accessibility (WCAG 2.1 AA), browser support, bundle size limits.
-- `.project/TECH_STACK.md`: Confirmed frameworks, package managers, testing suites, folder architecture.
-- `.project/DEPLOYMENT.md`: Netlify site ID, domains, secrets inventory.
+### The Host Project Contract (`.project/` & Root `AGENTS.md`)
+When Antigravity or any agent operates in a project equipped with this harness:
+- **`AGENTS.md` (Project Root)**: Instructs future agents on component boundaries (`src/components/ui/` vs `src/components/domain/`), contract-first mock data discipline (`src/services/mock/` with `VITE_USE_MOCKS=true`), and mandatory verification gates before opening PRs.
+- **`.project/SCOPE.md`**: Living roadmap, core user journeys, and milestone boundaries.
+- **`.project/CONSTRAINTS.md`**: Performance budgets (LCP < 2.5s, INP < 200ms), accessibility (WCAG 2.1 AA), browser support, bundle size limits.
+- **`.project/TECH_STACK.md`**: Confirmed frameworks, package managers, testing suites, folder architecture.
+- **`.project/DEPLOYMENT.md`**: Netlify site ID, domains, secrets inventory.
+- **`.project/features/`**: Feature-level spec files created from `FEATURE_TEMPLATE.md` to guide agents through discrete milestones.
+- **`.github/pull_request_template.md`**: Automated GitHub PR checklist enforcing contract validation, tests, and Netlify preview links.
 
 ---
 

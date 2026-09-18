@@ -36,24 +36,43 @@ if [[ -n "$SUBMODULE_URL" ]]; then
   fi
 fi
 
-# Scaffold .project/ directory if not present
-echo "Checking project specification directory (.project/)..."
-if [[ ! -d ".project" ]]; then
-  echo "Creating .project/ directory..."
-  mkdir -p .project
-
-  if [[ -d "$TARGET_PATH/templates/project-spec" ]]; then
-    cp "$TARGET_PATH/templates/project-spec/"*.md .project/
-    echo "Scaffolded default templates into .project/ from harness."
-  elif [[ -d "templates/project-spec" ]]; then
-    cp templates/project-spec/*.md .project/
-    echo "Scaffolded default templates into .project/ from local templates."
-  fi
-else
-  echo ".project/ directory already exists."
+# Determine templates root
+HARNESS_ROOT=""
+if [[ -d "$TARGET_PATH/templates" ]]; then
+  HARNESS_ROOT="$TARGET_PATH/templates"
+elif [[ -d "templates" ]]; then
+  HARNESS_ROOT="templates"
 fi
 
-# Verify .gitignore contains .worktrees/
+# 1. Scaffold .project/ directory & feature templates
+echo "Checking project specification directory (.project/)..."
+mkdir -p .project/features
+if [[ -n "$HARNESS_ROOT" && -d "$HARNESS_ROOT/project-spec" ]]; then
+  cp -n "$HARNESS_ROOT/project-spec/"*.md .project/ 2>/dev/null || true
+  cp -n "$HARNESS_ROOT/project-spec/features/"*.md .project/features/ 2>/dev/null || true
+  echo "Scaffolded default templates into .project/ from harness."
+fi
+
+# 2. Scaffold host repository AGENTS.md (living rules for future agent runs)
+if [[ ! -f "AGENTS.md" && -n "$HARNESS_ROOT" && -f "$HARNESS_ROOT/project-root/AGENTS.md" ]]; then
+  echo "Scaffolding host repository AGENTS.md..."
+  cp "$HARNESS_ROOT/project-root/AGENTS.md" AGENTS.md
+fi
+
+# 3. Scaffold GitHub PR template and CI/CD workflows
+mkdir -p .github/workflows
+if [[ -n "$HARNESS_ROOT" ]]; then
+  if [[ -f "$HARNESS_ROOT/github/pull_request_template.md" && ! -f ".github/pull_request_template.md" ]]; then
+    echo "Scaffolding .github/pull_request_template.md..."
+    cp "$HARNESS_ROOT/github/pull_request_template.md" .github/pull_request_template.md
+  fi
+  if [[ -d "$HARNESS_ROOT/github-actions" && ! -f ".github/workflows/ci.yml" ]]; then
+    echo "Scaffolding GitHub Actions CI pipelines..."
+    cp "$HARNESS_ROOT/github-actions/"*.yml .github/workflows/
+  fi
+fi
+
+# 4. Verify .gitignore contains .worktrees/
 if ! grep -q ".worktrees/" .gitignore 2>/dev/null; then
   echo "Adding .worktrees/ to .gitignore..."
   echo -e "\n# Isolated Git Worktrees\n.worktrees/" >> .gitignore

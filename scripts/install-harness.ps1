@@ -3,7 +3,7 @@
     Universal Frontend Development Harness — Project Installer for Windows PowerShell
 .DESCRIPTION
     Installs the harness as a git submodule in the host project, initializes .project/ specs,
-    and validates .gitignore.
+    scaffolds living project agent rules (AGENTS.md), feature templates, and CI/CD templates.
 .PARAMETER SubmoduleUrl
     The Git clone URL of the harness repository.
 .PARAMETER TargetPath
@@ -51,28 +51,62 @@ if ($SubmoduleUrl) {
     }
 }
 
-# Scaffold .project/ directory if not present
+# Determine template source root
+$harnessRoot = ""
+if (Test-Path "$TargetPath/templates") {
+    $harnessRoot = "$TargetPath/templates"
+} elseif (Test-Path "templates") {
+    $harnessRoot = "templates"
+}
+
+# 1. Scaffold .project/ directory and feature specs
 Write-Host "Checking project specification directory (.project/)..." -ForegroundColor Yellow
 if (-not (Test-Path ".project")) {
-    Write-Host "Creating .project/ directory..." -ForegroundColor Green
-    New-Item -ItemType Directory -Path ".project" -Force | Out-Null
+    Write-Host "Creating .project/ and .project/features/ directories..." -ForegroundColor Green
+    New-Item -ItemType Directory -Path ".project/features" -Force | Out-Null
 
-    $templateSource = ""
-    if (Test-Path "$TargetPath/templates/project-spec") {
-        $templateSource = "$TargetPath/templates/project-spec"
-    } elseif (Test-Path "templates/project-spec") {
-        $templateSource = "templates/project-spec"
-    }
-
-    if ($templateSource) {
-        Copy-Item -Path "$templateSource/*.md" -Destination ".project/" -Force
+    if ($harnessRoot) {
+        Copy-Item -Path "$harnessRoot/project-spec/*.md" -Destination ".project/" -Force
+        Copy-Item -Path "$harnessRoot/project-spec/features/*.md" -Destination ".project/features/" -Force
         Write-Host "Scaffolded default templates into .project/ from harness." -ForegroundColor Green
     }
 } else {
     Write-Host ".project/ directory already exists." -ForegroundColor Gray
+    if (-not (Test-Path ".project/features")) {
+        New-Item -ItemType Directory -Path ".project/features" -Force | Out-Null
+        if ($harnessRoot -and (Test-Path "$harnessRoot/project-spec/features")) {
+            Copy-Item -Path "$harnessRoot/project-spec/features/*.md" -Destination ".project/features/" -Force
+        }
+    }
 }
 
-# Ensure .worktrees/ is in .gitignore
+# 2. Scaffold host repository AGENTS.md (living rules for future agent runs)
+if (-not (Test-Path "AGENTS.md") -and $harnessRoot) {
+    if (Test-Path "$harnessRoot/project-root/AGENTS.md") {
+        Write-Host "Scaffolding host repository AGENTS.md..." -ForegroundColor Green
+        Copy-Item -Path "$harnessRoot/project-root/AGENTS.md" -Destination "AGENTS.md" -Force
+    }
+}
+
+# 3. Scaffold GitHub PR template and CI/CD actions
+if (-not (Test-Path ".github")) {
+    New-Item -ItemType Directory -Path ".github/workflows" -Force | Out-Null
+} elseif (-not (Test-Path ".github/workflows")) {
+    New-Item -ItemType Directory -Path ".github/workflows" -Force | Out-Null
+}
+
+if ($harnessRoot) {
+    if (Test-Path "$harnessRoot/github/pull_request_template.md" -and -not (Test-Path ".github/pull_request_template.md")) {
+        Write-Host "Scaffolding .github/pull_request_template.md..." -ForegroundColor Green
+        Copy-Item -Path "$harnessRoot/github/pull_request_template.md" -Destination ".github/pull_request_template.md" -Force
+    }
+    if (Test-Path "$harnessRoot/github-actions" -and -not (Test-Path ".github/workflows/ci.yml")) {
+        Write-Host "Scaffolding GitHub Actions CI pipelines..." -ForegroundColor Green
+        Copy-Item -Path "$harnessRoot/github-actions/*.yml" -Destination ".github/workflows/" -Force
+    }
+}
+
+# 4. Ensure .worktrees/ is in .gitignore
 if (Test-Path ".gitignore") {
     $gitignoreContent = Get-Content ".gitignore" -Raw
     if ($gitignoreContent -notmatch "\.worktrees/") {
