@@ -16,6 +16,7 @@ A universal, shareable **Antigravity Plugin** and development harness for modern
 ├── skills/
 │   ├── project-scoping/        # Inception, user journeys, constraints & acceptance criteria
 │   ├── tech-stack-config/      # Framework selection, scaffolding, strict TS, linting & tests
+│   ├── team-orchestration/     # Parallel subagent team dispatch (UI, DevOps, A11y, API)
 │   ├── worktree-workflow/      # Safe parallel agent development in isolated .worktrees/
 │   └── ci-cd-deployment/       # GitHub Actions CI & Netlify deploy previews via MCP
 ├── templates/                  # Ready-to-use blueprints injected into host projects
@@ -120,8 +121,8 @@ flowchart TD
     E --> F[Generates SCOPE.md, CONSTRAINTS.md, ARCHITECTURE.md]
     F --> G[Auto-activates skill: tech-stack-config]
     G --> H[Recommends Framework & Configures Tooling]
-    H --> I[Auto-activates skill: ci-cd-deployment]
-    I --> J[Sets up netlify.toml & GitHub Actions CI]
+    H --> I[Auto-activates skill: team-orchestration]
+    I --> J[Dispatches Parallel Subagents: DevOps, UI, A11y, API]
     J --> K[Feature Work Ready: Isolated Git Worktrees]
 ```
 
@@ -142,8 +143,12 @@ The agent selects and configures:
 - **Hygiene & Strictness**: Strict TypeScript (`strict: true`), ESLint/Biome, and Vitest suite.
 - **Documentation**: Records all decisions in `.project/TECH_STACK.md`.
 
-### 4. CI/CD & Deployments (`ci-cd-deployment`)
-The agent copies `netlify.toml` and `.github/workflows/ci.yml`, hooks up Netlify deploy previews, and tracks deployment configurations in `.project/DEPLOYMENT.md`.
+### 4. Parallel Subagent Delegation (`team-orchestration`)
+The Lead Agent invokes specialized subagents in parallel with `Workspace: "branch"`:
+- **DevOps & Pipeline Specialist**: Configures `netlify.toml`, `.github/workflows/ci.yml`, and preview checks.
+- **UI/UX & Design System Specialist**: Scaffolds Tailwind tokens, theme toggle, and foundational UI primitives in `src/components/ui/`.
+- **Accessibility & CWV Specialist**: Enforces landmark structures, skip links, and `axe-core` test setup.
+- **API & Security Specialist**: Builds resilient fetch client, Zod schemas, and data caching providers.
 
 ### 5. Isolated Worktrees (`worktree-workflow`)
 For subsequent feature development, the agent executes inside isolated git worktrees (`.worktrees/feat-<name>`), verifies builds and tests, pushes branches, and opens PRs using the **GitHub MCP**.
@@ -156,6 +161,7 @@ For subsequent feature development, the agent executes inside isolated git workt
 | :--- | :--- | :--- |
 | **`project-scoping`** | New project initialization, missing `.project/`, refining requirements. | `.project/SCOPE.md`, `.project/CONSTRAINTS.md`, `.project/ARCHITECTURE.md` |
 | **`tech-stack-config`** | Post-scoping, configuring framework, styling, testing, or linting. | Scaffolding, `tsconfig.json`, `package.json`, `.project/TECH_STACK.md` |
+| **`team-orchestration`** | Post-scoping foundation kickoff, parallel multi-agent milestone dispatch. | Concurrently runs DevOps, UI/UX, A11y, and API subagents in isolated branches |
 | **`worktree-workflow`** | Feature additions, bug fixes, parallel agent tasks. | Isolated `.worktrees/<branch>`, safe merge & cleanup |
 | **`ci-cd-deployment`** | Pipeline setup, Netlify preview verification, build troubleshooting. | `netlify.toml`, `.github/workflows/ci.yml`, `.project/DEPLOYMENT.md` |
 

@@ -102,13 +102,23 @@ flowchart TD
     A[Check .project/ directory] -->|Missing or Incomplete| B[Activate skill: project-scoping]
     A -->|Configured| C{Task Type?}
     B --> D[Activate skill: tech-stack-config]
-    D --> E[Activate skill: ci-cd-deployment]
-    E --> C
-    C -->|Feature / Fix / Spike| F[Activate skill: worktree-workflow]
-    F --> G[Implement Code in Isolated Worktree]
-    G --> H[Run Lint, Types, Tests]
-    H -->|Passes| I[Commit & Push Branch]
-    I --> J[Open PR via GitHub MCP]
-    J --> K[Verify Netlify Deploy Preview via Netlify MCP]
-    K --> L[Clean Up Worktree]
+    D --> E[Activate skill: team-orchestration]
+    E --> F[Parallel Subagents: DevOps, UI/UX, A11y, API]
+    F --> C
+    C -->|Feature / Fix / Spike| G[Activate skill: worktree-workflow]
+    G --> H[Implement Code in Isolated Worktree]
+    H --> I[Run Lint, Types, Tests]
+    I -->|Passes| J[Commit & Push Branch]
+    J --> K[Open PR via GitHub MCP]
+    K --> L[Verify Netlify Deploy Preview via Netlify MCP]
+    L --> M[Clean Up Worktree]
 ```
+
+### 5.2 Parallel Subagent Delegation (`team-orchestration`)
+To eliminate bottlenecks and prevent sequential delays, once the project is scoped and base framework scaffolded:
+- **Lead Agent** should invoke specialized subagents in parallel with `Workspace: "branch"`:
+  1. **DevOps & Pipeline Specialist**: Configures Netlify, GitHub Actions CI, and environment variables.
+  2. **UI/UX & Design System Specialist**: Sets up Tailwind tokens, base layout, and reusable UI primitives.
+  3. **Accessibility & CWV Specialist**: Configures keyboard traps, semantic landmarks, and a11y testing.
+  4. **API & Data Specialist**: Sets up resilient HTTP clients, cache providers, and Zod schemas.
+- Each subagent executes in an isolated branch worktree, reports progress back asynchronously, and opens PRs via GitHub MCP without blocking one another.
